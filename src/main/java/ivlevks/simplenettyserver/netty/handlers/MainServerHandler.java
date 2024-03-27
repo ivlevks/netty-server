@@ -34,7 +34,7 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         boolean handshakeDone = false;
 
         while (!handshakeDone) {
-            if (executor.getQueue().isEmpty()) {
+            if (executor.getActiveCount() < executor.getMaximumPoolSize()) {
                 ctx.writeAndFlush(Unpooled.copiedBuffer("Server is ready to receive the data.\n", CharsetUtil.UTF_8));
                 ctx.fireChannelActive();
                 handshakeDone = true;
@@ -44,7 +44,8 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     /**
      * Reading msg,
-     * first time remove ReadTimeOutHandler if exists
+     * first time remove ReadTimeOutHandler,
+     * create task processing input message
      * @param ctx
      * @param msg
      */
@@ -53,7 +54,10 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (ctx.pipeline().first().getClass().equals(ReadTimeoutHandler.class)) {
             ctx.pipeline().remove(ReadTimeoutHandler.class);
         }
-        ctx.write(msg);
+
+        executor.submit(() -> {
+            service.processingMessage(msg);
+        });
     }
 
     @Override
