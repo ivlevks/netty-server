@@ -9,10 +9,11 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.CharsetUtil;
 import ivlevks.simplenettyserver.service.MainService;
+import ivlevks.simplenettyserver.utils.DataParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
@@ -22,6 +23,7 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private final ThreadPoolExecutor executor;
     private final MainService service;
+    private final DataParser parser;
 
     /**
      * Doing handshake with client
@@ -43,21 +45,32 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     /**
-     * Reading msg,
-     * first time remove ReadTimeOutHandler,
-     * create task processing input message
+     * Reading msg, first time remove ReadTimeOutHandler,
+     * get time from data, create task processing input message,
+     * cancelling processing after timeout
      * @param ctx
      * @param msg
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+
         if (ctx.pipeline().first().getClass().equals(ReadTimeoutHandler.class)) {
             ctx.pipeline().remove(ReadTimeoutHandler.class);
         }
 
-        executor.submit(() -> {
+        int timeout = parser.getTimeout(msg);
+
+        Future<Object> future = executor.submit(() -> {
             service.processingMessage(msg);
+            return null;
         });
+
+        try {
+            future.get(timeout, TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            future.cancel(true);
+            log.info("Processing done");
+        }
     }
 
     @Override

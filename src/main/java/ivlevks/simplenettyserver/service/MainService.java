@@ -11,12 +11,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MainService {
 
-    public void processingMessage(Object msg) {
-
-        ByteBuf in = (ByteBuf) msg;
-        String data = in.toString(CharsetUtil.UTF_8);
-
-
+    public void processingMessage(Object msg) throws InterruptedException {
+        for (int i = 0; i < 1000; i++) {
+            Thread.sleep(1000);
+            System.out.println("task running!");
+        }
     }
-
 }
