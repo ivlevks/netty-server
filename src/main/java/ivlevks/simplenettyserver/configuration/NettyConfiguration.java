@@ -7,6 +7,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import ivlevks.simplenettyserver.netty.handlers.MainServerHandler;
+import ivlevks.simplenettyserver.netty.handlers.TimeoutHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,6 +31,7 @@ public class NettyConfiguration {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(timeoutHandler());
                         ch.pipeline().addLast(mainServerHandler);
                     }
                 })
@@ -37,6 +39,12 @@ public class NettyConfiguration {
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         return b;
+    }
+
+    @Bean
+    public TimeoutHandler timeoutHandler() {
+        int timeout = nettyProperties.getTimeoutReading();
+        return new TimeoutHandler(timeout);
     }
 
     @Bean(destroyMethod = "shutdownGracefully")

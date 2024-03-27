@@ -28,4 +28,10 @@ public class NettyProperties {
 
     @NotNull
     private int backlog;
+
+    @NotNull
+    private int timeoutReading;
+
+    @NotNull
+    private int countThreads;
 }
