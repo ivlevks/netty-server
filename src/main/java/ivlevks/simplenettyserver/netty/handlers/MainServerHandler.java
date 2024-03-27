@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.CharsetUtil;
 import ivlevks.simplenettyserver.service.MainService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,12 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final ThreadPoolExecutor executor;
     private final MainService service;
 
+    /**
+     * Doing handshake with client
+     * if exists free threads
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         boolean handshakeDone = false;
@@ -35,8 +42,17 @@ public class MainServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
     }
 
+    /**
+     * Reading msg,
+     * first time remove ReadTimeOutHandler if exists
+     * @param ctx
+     * @param msg
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        if (ctx.pipeline().first().getClass().equals(ReadTimeoutHandler.class)) {
+            ctx.pipeline().remove(ReadTimeoutHandler.class);
+        }
         ctx.write(msg);
     }
 
