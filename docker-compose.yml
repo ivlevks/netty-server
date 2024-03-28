@@ -1,0 +1,12 @@
+version: "1.0"
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: info
+      POSTGRES_USER: kostik
+      POSTGRES_PASSWORD: qwerty
+
+
+    ports:
+      - "5432:5432"

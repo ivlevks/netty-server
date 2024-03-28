@@ -26,14 +26,19 @@ public class DataParser {
 
         ByteBuf in = (ByteBuf) msg;
         String data = in.toString(CharsetUtil.UTF_8);
-
-        return parseTimeout(data);
-    }
-
-    private int parseTimeout(String data) {
-
         String[] array = data.split(" ");
         return Integer.parseInt(array[0]);
+    }
 
+    /**
+     * Get message
+     * @param msg
+     * @return
+     */
+    public String getMessage(Object msg) {
+        ByteBuf in = (ByteBuf) msg;
+        String data = in.toString(CharsetUtil.UTF_8);
+        String[] array = data.split(" ");
+        return array[1];
     }
 }
