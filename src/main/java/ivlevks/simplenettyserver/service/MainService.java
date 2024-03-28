@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
 public class MainService {
 
     public void processingMessage(Object msg) throws InterruptedException {
+
         for (int i = 0; i < 1000; i++) {
             Thread.sleep(1000);
-            System.out.println("task running!");
+            System.out.println("task running");
         }
+
     }
 }

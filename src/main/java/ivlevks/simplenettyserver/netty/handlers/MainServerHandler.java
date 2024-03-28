@@ -119,6 +119,12 @@ public class MainServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     * Exception, timeout handling
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 
