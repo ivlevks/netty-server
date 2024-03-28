@@ -31,7 +31,6 @@ public class NettyConfiguration {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new ReadTimeoutHandler(nettyProperties.getTimeoutReading()));
                         ch.pipeline().addLast(mainServerHandler);
                     }
                 })

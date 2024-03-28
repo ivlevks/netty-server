@@ -15,10 +15,10 @@ public class DataParser {
         ByteBuf in = (ByteBuf) msg;
         String data = in.toString(CharsetUtil.UTF_8);
 
-        return parseTimeoutProcessingData(data);
+        return parseMessage(data);
     }
 
-    private int parseTimeoutProcessingData(String data) {
+    private int parseMessage(String data) {
         String[] array = data.split(" ");
         return Integer.parseInt(array[0]);
     }
